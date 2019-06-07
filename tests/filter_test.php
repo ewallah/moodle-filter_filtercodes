@@ -64,9 +64,11 @@ class filter_filtercodes_testcase extends advanced_testcase {
         $this->setUser($user);
         $quiz = $this->getDataGenerator()->create_module('quiz', ['course' => $course->id]);
         $context = context_course::instance($course->id);
-        $quizcontext =context_module::instance($quiz->cmid);
+        $quizcontext = context_module::instance($quiz->cmid);
+        $cm = get_coursemodule_from_instance('quiz', $quiz->id);
         $PAGE->set_url(new moodle_url('/mod/quiz/view.php', ['id' => $quiz->id]));
         $PAGE->set_context($quizcontext);
+        $PAGE->set_cm($cm, $course, $quiz);
         filter_set_local_state('filtercodes', $context->id, TEXTFILTER_ON);
         filter_set_local_state('filtercodes', $quizcontext->id, TEXTFILTER_ON);
         $tests = array(
@@ -194,15 +196,15 @@ class filter_filtercodes_testcase extends advanced_testcase {
             ),
             array (
                  'before' => '{courseid}',
-                 'after'  => 1,
+                 'after'  => $course->id,
             ),
             array (
                  'before' => '{coursename}',
-                 'after'  => $SITE->fullname,
+                 'after'  => $course->fullname,
             ),
             array (
                 'before' => '{courseshortname}',
-                'after'  => $SITE->fullname,
+                'after'  => $course->shortname,
             ),
             array (
                 'before' => '{coursecount}',
@@ -242,11 +244,11 @@ class filter_filtercodes_testcase extends advanced_testcase {
             ),
             array (
                 'before' => '{sectionid}',
-                'after'  => @$PAGE->cm->sectionnum,
+                'after'  => $PAGE->cm->sectionnum,
             ),
             array (
                 'before' => '%7Bsectionid%7D',
-                'after'  => @$PAGE->cm->sectionnum,
+                'after'  => $PAGE->cm->sectionnum,
             ),
             array (
                 'before' => '{readonly}',
